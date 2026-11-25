@@ -1,0 +1,1 @@
+{"outputDirectory":"public","rewrites":[{"source":"/api/bot","destination":"/api/index?action=webhook"},{"source":"/api/tick","destination":"/api/index?action=tick"}]}
