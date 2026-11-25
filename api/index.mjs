@@ -1,5 +1,5 @@
 import {verify,draw,due,view} from '../lib/core.mjs';
-const env=process.env;const db=()=>`${env.SUPABASE_URL}/rest/v1/santa_state`;const headers=()=>({apikey:env.SUPABASE_SERVICE_ROLE_KEY,...(env.SUPABASE_SERVICE_ROLE_KEY?.startsWith('sb_secret_')?{}:{Authorization:Bearer }),'Content-Type':'application/json',Prefer:'return=representation'});
+const env=process.env;const db=()=>`${env.SUPABASE_URL}/rest/v1/santa_state`;const headers=()=>({apikey:env.SUPABASE_SERVICE_ROLE_KEY,...(env.SUPABASE_SERVICE_ROLE_KEY?.startsWith('sb_secret_')?{}:{Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY}),'Content-Type':'application/json',Prefer:'return=representation'});
 async function archive(){const r=await fetch(`${env.SUPABASE_URL}/rest/v1/santa_first_draw?id=eq.1&select=distribution,reveal_at,saved_at`,{headers:headers()});if(!r.ok)throw Error('Выполните migration-v2.sql');return (await r.json())[0]||null}
 async function load(){const r=await fetch(db()+'?id=eq.1',{headers:headers()});if(!r.ok)throw Error('База недоступна');const [row]=await r.json();if(!row)throw Error('Выполните schema.sql');return row}
 async function save(row){const r=await fetch(db()+`?id=eq.1&version=eq.${row.version}`,{method:'PATCH',headers:headers(),body:JSON.stringify({version:row.version+1,data:row.data})});if(!r.ok)throw Error('Ошибка сохранения');return (await r.json()).length===1}
