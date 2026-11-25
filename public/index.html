@@ -12,7 +12,7 @@ async function findProductPhoto(url) {
     const response = await fetch('/api/index', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({initData:tg?.initData, action:'productPhoto', url}),
-      signal:AbortSignal.timeout(11000),
+      signal:AbortSignal.timeout(14000),
     });
     if (!response.ok) return null;
     return (await response.json()).photo;
