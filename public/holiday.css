@@ -22,3 +22,9 @@ nav{flex-wrap:wrap;gap:4px;margin-top:14px}nav button{width:auto;flex:1 1 auto;p
 @keyframes photo-spin{to{transform:rotate(360deg)}}
 @keyframes section-enter{from{opacity:0;transform:translateY(8px)}}
 @media(prefers-reduced-motion:reduce){.searching::before,.section-enter{animation:none}}
+
+button:not(:disabled):active{transform:scale(.97)}
+#app.section-leaving section{animation:section-out .125s ease-in both}
+#app.section-leaving nav .active::before,.button-pending::before{content:"";display:inline-block;box-sizing:border-box;width:.8em;height:.8em;margin-right:.45em;vertical-align:-.03em;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:photo-spin .65s linear infinite}
+@keyframes section-out{to{opacity:0;transform:translateY(-5px)}}
+@media(prefers-reduced-motion:reduce){#app.section-leaving section,#app.section-leaving nav .active::before,.button-pending::before{animation:none}}
