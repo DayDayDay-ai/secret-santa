@@ -1,3 +1,19 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import {draw,view,verify,due} from './lib/core.mjs';import {createHmac} from 'node:crypto';
 const people=Array.from({length:6},(_,i)=>({name:['Мария','Александр','Алина','Михаил','Карина','Ильхам'][i],pair:Math.floor(i/2),uid:String(i+1),gifts:[{name:'gift'+i}]}));
 test('10000 valid draws',()=>{for(let n=0;n<10000;n++){const a=draw(people);assert.equal(new Set(a).size,6);a.forEach((j,i)=>{assert.notEqual(i,j);assert.notEqual(people[i].pair,people[j].pair);assert.equal(i%2,j%2)})}});test('privacy',()=>{const s={people,draw:draw(people)};const admin=view(s,'99',true);assert.equal(admin.target,null);assert.equal(admin.me,null);assert.ok(!JSON.stringify(admin).includes('gift'));const p=view(s,'1',true);assert.equal(p.target.name,people[s.draw[0]].name);assert.equal(p.people[0].uid,undefined)});test('due',()=>{assert.ok(due({people,date:new Date(0).toISOString()}));assert.ok(!due({people:people.slice(0,5).concat({}),date:new Date(0).toISOString()}))});test('Telegram HMAC',()=>{const token='test';const p=new URLSearchParams({auth_date:String(Math.floor(Date.now()/1000)),user:JSON.stringify({id:123})});const secret=createHmac('sha256','WebAppData').update(token).digest();p.set('hash',createHmac('sha256',secret).update([...p].sort().map(([k,v])=>k+'='+v).join('\n')).digest('hex'));assert.equal(verify(p.toString(),token),'123');assert.throws(()=>verify(p.toString(),'wrong'))});
+
+test('a rebound profile cannot see the archived recipient', () => {
+  const participants = structuredClone(people);
+  const distribution = draw(participants);
+  participants[0].uid = 'replacement-account';
+  participants[0].gifts = [];
+  participants[0].revealBlocked = true;
+  const state = {people: participants, draw: distribution};
+  const rebound = view(state, 'replacement-account', false);
+  assert.equal(rebound.drawn, true);
+  assert.equal(rebound.revealBlocked, true);
+  assert.equal(rebound.target, null);
+  assert.deepEqual(rebound.me.gifts, []);
+  assert.equal(view(state, '1', false).me, null);
+  assert.equal(view(state, '2', false).target.name, participants[distribution[1]].name);
+});
