@@ -50,3 +50,14 @@ button:not(:disabled):active{transform:scale(.97)}
   .home-countdown [data-action="tab:gifts"]{display:none}
   .home-countdown p:last-of-type{margin-bottom:0}
 }
+
+@media(max-width:520px){
+  #app:is([data-tab="gifts"],[data-tab="target"],[data-tab="admin"]) section{padding:10px 12px}
+  #app:is([data-tab="gifts"],[data-tab="admin"]) :is(input,textarea){margin:3px 0 7px;padding:9px 11px}
+  #app[data-tab="gifts"] textarea{min-height:54px}
+  #app:is([data-tab="gifts"],[data-tab="target"]) .gift{gap:8px;margin:6px 0}
+  #app:is([data-tab="gifts"],[data-tab="target"]) .gift img{width:62px;height:62px}
+  #app[data-tab="target"] .hero{padding:8px 0}
+  #app[data-tab="target"] .hero h1{margin:7px 0;font-size:34px}
+  #app[data-tab="target"] .box{margin:18px auto 12px}
+}
