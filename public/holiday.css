@@ -32,3 +32,16 @@ button:not(:disabled):active{transform:scale(.97)}
 .gallery-picker{display:block;padding:11px 12px;margin:8px 0;border:1px solid #cdb47d66;border-radius:12px;text-align:center;cursor:pointer;color:#f2d9a3}
 .gallery-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 #photo-upload:focus-within .gallery-picker{outline:2px solid #f2d9a3;outline-offset:2px}
+
+@media(max-width:520px){
+  main{padding-top:max(10px,env(safe-area-inset-top))}
+  nav{gap:4px;margin-bottom:6px}
+  nav button{margin:0;font-size:12px}
+  section{margin:8px 0;padding:12px 14px;border-radius:17px}
+  section h2{font-size:22px;line-height:1.12;margin-bottom:6px}
+  section h2[style]{margin-top:8px!important}
+  section p{font-size:14px;line-height:1.35;margin:6px 0}
+  section button{margin:4px 0 0;padding:8px 10px}
+  .pill{padding:3px 8px}
+  .count{font-size:24px}
+}
