@@ -63,3 +63,12 @@ button:not(:disabled):active{transform:scale(.97)}
 
 .reveal-ready{border-color:#e9c98980;background:radial-gradient(ellipse at top right,#69542f88,transparent 65%),linear-gradient(130deg,#25473d,#13362e)}
 .unwrap-button{border:1px solid #fff1bb;box-shadow:0 3px 16px #e9c98935}
+
+.recipient-budget{color:#f2d9a3}
+.recipient-gift{align-items:flex-start}
+.recipient-gift img{width:72px;height:72px;aspect-ratio:1;flex:none;object-fit:contain;background:#0a2722}
+.recipient-gift-title{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
+.recipient-gift-title a{flex:1 1 100px;font-weight:700}
+.recipient-gift-title button{width:auto;min-height:38px;margin:0;padding:5px 8px;font-size:12px}
+.gift-comment{font-size:13px;color:#d7e5d9;white-space:pre-wrap;overflow-wrap:anywhere}
+.gift-comment summary{cursor:pointer;color:#e9cf9b}
