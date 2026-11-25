@@ -45,3 +45,8 @@ button:not(:disabled):active{transform:scale(.97)}
   .pill{padding:3px 8px}
   .count{font-size:24px}
 }
+
+@media(max-width:520px){
+  .home-countdown [data-action="tab:gifts"]{display:none}
+  .home-countdown p:last-of-type{margin-bottom:0}
+}
