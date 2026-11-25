@@ -16,3 +16,9 @@ nav{flex-wrap:wrap;gap:4px;margin-top:14px}nav button{width:auto;flex:1 1 auto;p
 .box:before{content:"";position:absolute;inset:-8px -4px auto;height:14px;background:linear-gradient(90deg,#be5a58 43%,#ffdda0 43% 56%,#ab494a 56%);border-radius:3px;transform-origin:left bottom;animation:unwrap .8s ease-out both}
 .reveal h1{animation:appear .9s ease-out both}@keyframes unwrap{to{transform:translate(-5px,-10px) rotate(-18deg)}}@keyframes appear{from{opacity:0;transform:translateY(8px)}}
 @media(prefers-reduced-motion:reduce){.box:before,.reveal h1{animation:none}}
+
+.searching::before{content:"";display:inline-block;width:.85em;height:.85em;margin-right:.55em;vertical-align:-.08em;border:2px solid #eec77c55;border-top-color:#eec77c;border-radius:50%;animation:photo-spin .75s linear infinite}
+.section-enter{animation:section-enter .25s ease-out both}
+@keyframes photo-spin{to{transform:rotate(360deg)}}
+@keyframes section-enter{from{opacity:0;transform:translateY(8px)}}
+@media(prefers-reduced-motion:reduce){.searching::before,.section-enter{animation:none}}
