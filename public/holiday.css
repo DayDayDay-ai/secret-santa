@@ -47,7 +47,7 @@ button:not(:disabled):active{transform:scale(.97)}
 }
 
 @media(max-width:520px){
-  .home-countdown p:last-of-type{margin-bottom:0}
+  .home-countdown p:has(+ button){margin-bottom:6px}
 }
 
 @media(max-width:520px){
