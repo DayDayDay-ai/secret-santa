@@ -14,96 +14,57 @@ function recipientCards(gifts) {
     return `<article class="gift recipient-gift"><img src="${esc(gift.photo)}" alt="" loading="lazy"><div><div class="recipient-gift-title"><a href="${esc(gift.url)}" target="_blank" rel="noopener noreferrer">${esc(gift.name)}</a>${btn('Копировать','copyGift:'+index,'secondary')}</div>${comment}</div></article>`;
   }).join('');
 }
-function render(){if(!state)return;let out='';if(!state.me){out+=`<section><h2>Кто ты?</h2><p>Выбери своё имя и повтори его точно как в списке.</p><select id="person"><option value="">Выбрать себя</option>${state.people.map((p,i)=>`<option value="${i}" ${p.claimed?'disabled':''}>${esc(p.name)}${p.claimed?' • занято':''}</option>`).join('')}</select><input id="name" placeholder="Напиши своё имя" autocomplete="off">${btn('Присоединиться','claim')}</section>`}if(state.me||state.admin){out+=`<nav>${state.me?btn('Главная','tab:home',tab==='home'?'active':'secondary')+btn('Добавить подарок','tab:gifts',tab==='gifts'?'active':'secondary')+btn('Кому я дарю','tab:target',tab==='target'?'active':'secondary'):''}</nav>`}if(state.me&&tab==='home'){out+=`<section class="${state.target?'reveal-ready':''}"><h2>${state.target?'Подарок под ёлкой готов':'Твоя тайна под ёлкой'}</h2><p>${state.target?'Узнай, для кого ты готовишь подарок.':state.revealBlocked?'Прежнее назначение недоступно после сброса профиля.':state.date?'Имя откроется в назначенное время, когда все зарегистрируются.':'Дата раскрытия ещё не выбрана.'}</p>${state.target?btn('🎁 Открыть подарок','tab:target','unwrap-button'):btn('Узнать, кому я дарю','tab:target','secondary')}</section><section class="home-countdown"><span class="pill">Привет, ${esc(state.me.name)}!</span><h2 style="margin-top:15px">До раскрытия тайны</h2><div class="count" id="timer"></div><p>${esc(dateText())} · Алматы</p><p>Участники: ${state.people.filter(p=>p.claimed).length}/6</p>${state.budget?`<p>Бюджет: ${esc(state.budget)}</p>`:''}${btn('Добавить подарок','tab:gifts')}</section>`}if(state.me&&tab==='gifts'){const g=editing!==null?state.me.gifts[editing]:{};out+=`<section><h2>Мои желания</h2>${cards(state.me.gifts,true)}</section><section><h2>${editing!==null?'Редактировать':'Добавить подарок'}</h2><label>Название</label><input id="giftname" maxlength="100" value="${esc(g?.name)}"><label>Ссылка на товар</label><input id="url" type="url" value="${esc(g?.url)}" placeholder="https://kaspi.kz/…"><div id="photo-upload" ${editing===null?'hidden':''}><label class="gallery-picker" for="photo">Выбрать фото из галереи</label><input class="gallery-input" id="photo" type="file" accept="image/*"></div><img id="photo-preview" alt="Фото подарка" hidden style="max-width:100%;max-height:180px"><p id="photo-status" role="status" hidden></p><label>Комментарий</label><textarea id="note" maxlength="500">${esc(g?.note)}</textarea>${btn('Сохранить подарок','saveGift')}${editing!==null?btn('Отмена','cancel','secondary'):''}</section>`}if(state.me&&tab==='target'){out+=state.target?`<section><div class="hero reveal"><span class="box" aria-hidden="true"></span><p>Ты даришь подарок</p><h1>${esc(state.target.name)}</h1><p class="recipient-budget">${state.budget?'Бюджет подарка · '+esc(state.budget):'Бюджет пока не указан'}</p></div></section><section><h2>Список желаний</h2>${recipientCards(state.target.gifts)}</section>`:`<section><h2>🔒 Пока секрет</h2><p>${state.revealBlocked?'Прежнее назначение недоступно после сброса профиля.':state.date?'Имя откроется в назначенное время, когда все шесть участников зарегистрируются.':'Дата раскрытия ещё не выбрана.'}</p>${btn('Добавить подарок','tab:gifts')}${btn('Вернуться на главную','tab:home','secondary')}</section>`}if(state.admin&&tab==='admin'){out+=`<section><h2>Настройки события</h2><label>Дата и время (Алматы)</label><input id="date" type="datetime-local" value="${localDate(state.date)}" ${state.drawn?'disabled':''}><label>Бюджет</label><input id="budget" value="${esc(state.budget)}" placeholder="20 000 ₸">${btn('Сохранить настройки','settings')}<p>Жеребьёвка: ${state.drawn?'проведена':'ожидается'}</p><p>Резервная копия: ${state.backupSaved?'✓ сохранена':'будет создана при жеребьёвке'}</p>${state.backupSaved?`<small>${esc(new Date(state.backupSavedAt).toLocaleString('ru-RU',{timeZone:'Asia/Almaty'}))} · Алматы</small>${btn('Восстановить первую жеребьёвку','restoreDraw','secondary')}`:''}<p><small>Результаты фиксируются навсегда. Сброс очищает желания и закрывает доступ к прежнему назначению.</small></p></section><section><h2>Участники</h2>${state.people.map((p,i)=>`<div class="row"><div style="flex:1">${esc(p.name)}<br><small>${p.claimed?'Зарегистрирован':'Ожидает'}</small></div>${p.claimed?btn('Сбросить','resetProfile:'+i,'secondary'):''}</div>`).join('')}<small>В админ-панели нет подарков и результатов.</small></section>`}if(state.me&&state.admin&&tab==='gifts')out+=btn('Настройки','tab:admin','secondary');app.dataset.tab=tab;app.innerHTML=out;timer();setupGiftForm()}
+function render(){if(!state)return;let out='';if(!state.me){out+=`<section><h2>Кто ты?</h2><p>Выбери своё имя и повтори его точно как в списке.</p><select id="person"><option value="">Выбрать себя</option>${state.people.map((p,i)=>`<option value="${i}" ${p.claimed?'disabled':''}>${esc(p.name)}${p.claimed?' • занято':''}</option>`).join('')}</select><input id="name" placeholder="Напиши своё имя" autocomplete="off">${btn('Присоединиться','claim')}</section>`}if(state.me||state.admin){out+=`<nav>${state.me?btn('Главная','tab:home',tab==='home'?'active':'secondary')+btn('Добавить подарок','tab:gifts',tab==='gifts'?'active':'secondary')+btn('Кому я дарю','tab:target',tab==='target'?'active':'secondary'):''}</nav>`}if(state.me&&tab==='home'){out+=`<section class="${state.target?'reveal-ready':''}"><h2>${state.target?'Подарок под ёлкой готов':'Твоя тайна под ёлкой'}</h2><p>${state.target?'Узнай, для кого ты готовишь подарок.':state.revealBlocked?'Прежнее назначение недоступно после сброса профиля.':state.date?'Имя откроется в назначенное время, когда все зарегистрируются.':'Дата раскрытия ещё не выбрана.'}</p>${state.target?btn('🎁 Открыть подарок','tab:target','unwrap-button'):btn('Узнать, кому я дарю','tab:target','secondary')}</section><section class="home-countdown"><span class="pill">Привет, ${esc(state.me.name)}!</span><h2 style="margin-top:15px">До раскрытия тайны</h2><div class="count" id="timer"></div><p>${esc(dateText())} · Алматы</p><p>Участники: ${state.people.filter(p=>p.claimed).length}/6</p>${state.budget?`<p>Бюджет: ${esc(state.budget)}</p>`:''}${btn('Добавить подарок','tab:gifts')}</section>`}if(state.me&&tab==='gifts'){const g=editing!==null?state.me.gifts[editing]:{};out+=`<section><h2>Мои желания</h2>${cards(state.me.gifts,true)}</section><section><h2>${editing!==null?'Редактировать':'Добавить подарок'}</h2><label>Название</label><input id="giftname" maxlength="100" value="${esc(g?.name)}"><label>Ссылка на товар</label><input id="url" type="url" value="${esc(g?.url)}" placeholder="https://kaspi.kz/…"><div id="photo-upload"><label class="gallery-picker" for="photo">Добавить фото</label><input class="gallery-input" id="photo" type="file" accept="image/*"></div><img id="photo-preview" alt="Фото подарка" hidden style="max-width:100%;max-height:180px"><p id="photo-status" role="status" hidden></p><label>Комментарий</label><textarea id="note" maxlength="500">${esc(g?.note)}</textarea>${btn('Сохранить подарок','saveGift')}${editing!==null?btn('Отмена','cancel','secondary'):''}</section>`}if(state.me&&tab==='target'){out+=state.target?`<section><div class="hero reveal"><span class="box" aria-hidden="true"></span><p>Ты даришь подарок</p><h1>${esc(state.target.name)}</h1><p class="recipient-budget">${state.budget?'Бюджет подарка · '+esc(state.budget):'Бюджет пока не указан'}</p></div></section><section><h2>Список желаний</h2>${recipientCards(state.target.gifts)}</section>`:`<section><h2>🔒 Пока секрет</h2><p>${state.revealBlocked?'Прежнее назначение недоступно после сброса профиля.':state.date?'Имя откроется в назначенное время, когда все шесть участников зарегистрируются.':'Дата раскрытия ещё не выбрана.'}</p>${btn('Добавить подарок','tab:gifts')}${btn('Вернуться на главную','tab:home','secondary')}</section>`}if(state.admin&&tab==='admin'){out+=`<section><h2>Настройки события</h2><label>Дата и время (Алматы)</label><input id="date" type="datetime-local" value="${localDate(state.date)}" ${state.drawn?'disabled':''}><label>Бюджет</label><input id="budget" value="${esc(state.budget)}" placeholder="20 000 ₸">${btn('Сохранить настройки','settings')}<p>Жеребьёвка: ${state.drawn?'проведена':'ожидается'}</p><p>Резервная копия: ${state.backupSaved?'✓ сохранена':'будет создана при жеребьёвке'}</p>${state.backupSaved?`<small>${esc(new Date(state.backupSavedAt).toLocaleString('ru-RU',{timeZone:'Asia/Almaty'}))} · Алматы</small>${btn('Восстановить первую жеребьёвку','restoreDraw','secondary')}`:''}<p><small>Результаты фиксируются навсегда. Сброс очищает желания и закрывает доступ к прежнему назначению.</small></p></section><section><h2>Участники</h2>${state.people.map((p,i)=>`<div class="row"><div style="flex:1">${esc(p.name)}<br><small>${p.claimed?'Зарегистрирован':'Ожидает'}</small></div>${p.claimed?btn('Сбросить','resetProfile:'+i,'secondary'):''}</div>`).join('')}<small>В админ-панели нет подарков и результатов.</small></section>`}if(state.me&&state.admin&&tab==='gifts')out+=btn('Настройки','tab:admin','secondary');app.dataset.tab=tab;app.innerHTML=out;timer();setupGiftForm()}
 function timer(){let e=document.querySelector('#timer');if(!e)return;let n=Date.parse(state.date)-Date.now();e.hidden=!state.date;if(!state.date)return;if(n<=0)e.textContent=state.drawn?'Тайна раскрыта':'Ожидаем участников';else{let s=Math.floor(n/1000);e.textContent=`${Math.floor(s/86400)}д ${String(Math.floor(s/3600)%24).padStart(2,'0')}:${String(Math.floor(s/60)%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}}
 async function photo(file){if(!file)throw Error('Добавь фотографию');const im=new Image();const url=URL.createObjectURL(file);try{im.src=url;await im.decode();let c=document.createElement('canvas'),scale=Math.min(1,720/Math.max(im.width,im.height));c.width=Math.max(1,Math.round(im.width*scale));c.height=Math.max(1,Math.round(im.height*scale));let ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(im,0,0,c.width,c.height);for(let q=.82;q>=.2;q-=.1){const d=c.toDataURL('image/jpeg',q);if(d.length<=60000)return d}throw Error('Фото слишком большое')}finally{URL.revokeObjectURL(url)}}
-async function findProductPhoto(url) {
-  try {
-    const response = await fetch('/api/index', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({initData:tg?.initData, action:'productPhoto', url}),
-      signal:AbortSignal.timeout(38000),
-    });
-    if (!response.ok) return null;
-    return (await response.json()).photo;
-  } catch {
-    return null;
-  }
-}
 function setupGiftForm() {
   const link = app.querySelector('#url');
   if (!link) return;
   const name = app.querySelector('#giftname');
   const preview = app.querySelector('#photo-preview');
   const status = app.querySelector('#photo-status');
-  const upload = app.querySelector('#photo-upload');
   const save = app.querySelector('[data-action="saveGift"]');
   let revision = 0;
-  let debounce;
-  const validLink = () => {
-    try {
-      const url = new URL(link.value.trim());
-      return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
-    } catch { return ''; }
-  };
-  const validate = () => { save.disabled = !name.value.trim() || !validLink() || preview.dataset.url !== validLink() || !preview.hasAttribute('src'); };
-  const display = (image, url) => {
-    preview.src = image;
-    preview.dataset.url = url;
+  let preparing = false;
+  function validate() {
+    let valid = false;
+    try { valid = ['https:', 'http:'].includes(new URL(link.value.trim()).protocol); } catch {}
+    save.disabled = preparing || !name.value.trim() || !valid || !preview.hasAttribute('src');
+  }
+  const previous = editing === null ? null : state.me.gifts[editing];
+  if (previous?.photo) {
+    preview.src = previous.photo;
     preview.hidden = false;
-    validate();
-  };
-  const prepare = async (source, statusText, failureText) => {
-    const url = validLink();
-    if (!url) return;
-    clearTimeout(debounce);
+  }
+  link.addEventListener('input', validate);
+  name.addEventListener('input', validate);
+  app.querySelector('#photo').addEventListener('change', async event => {
+    const file = event.target.files[0];
+    if (!file) return;
     const current = ++revision;
-    preview.removeAttribute('src');
-    preview.hidden = true;
+    preparing = true;
     validate();
     status.hidden = false;
-    status.classList.add('searching');
-    status.textContent = statusText;
+    status.textContent = 'Готовим фото…';
     try {
-      const image = await source(url);
-      if (current !== revision || !link.isConnected) return;
-      if (!image) throw Error();
-      display(image, url);
+      const image = await photo(file);
+      if (current !== revision) return;
+      preview.src = image;
+      preview.hidden = false;
       status.textContent = 'Фото готово';
     } catch {
-      if (current !== revision || !link.isConnected) return;
-      status.textContent = failureText;
+      if (current !== revision) return;
+      event.target.value = '';
+      status.textContent = 'Не удалось обработать фото. Выбери другое изображение.';
     } finally {
-      if (current === revision && link.isConnected) {
-        status.classList.remove('searching');
-        upload.hidden = false;
+      if (current === revision) {
+        preparing = false;
+        validate();
       }
     }
-  };
-  link.addEventListener('input', () => {
-    clearTimeout(debounce);
-    ++revision;
-    preview.removeAttribute('src');
-    preview.hidden = true;
-    status.hidden = true;
-    status.classList.remove('searching');
-    upload.hidden = true;
-    validate();
-    if (validLink()) debounce = setTimeout(() => prepare(async url => {
-      const image = await findProductPhoto(url);
-      return image;
-    }, 'Ищем фото товара…', 'Фото не найдено. Выберите его из галереи.'), 450);
   });
-  name.addEventListener('input', validate);
-  app.querySelector('#photo').addEventListener('change', event => {
-    const file = event.target.files[0];
-    if (file) prepare(() => photo(file), 'Готовим фото…', 'Не удалось обработать файл. Попробуйте другое фото.');
-  });
-  const previous = editing === null ? null : state.me.gifts[editing];
-  if (previous?.photo && validLink()) display(previous.photo, validLink());
   validate();
 }
-
 app.addEventListener('click',async e=>{const trigger=e.target.closest('[data-action]');const a=trigger?.dataset.action;if(!a||busy||app.classList.contains('section-leaving'))return;const [cmd,arg]=a.split(':');const val=id=>document.getElementById(id)?.value;let ok=false;const showPending=['claim','saveGift','settings','restoreDraw','resetProfile','delete'].includes(cmd);if(showPending){trigger.classList.add('button-pending');trigger.setAttribute('aria-busy','true');}try{if(cmd==='tab'){
   if(tab===arg || app.classList.contains('section-leaving'))return;
   const selected=app.querySelector('nav [data-action="tab:'+arg+'"]');
@@ -141,5 +102,5 @@ app.addEventListener('click',async e=>{const trigger=e.target.closest('[data-act
   setTimeout(()=>{trigger.textContent='Копировать'},1100);
   return;
 }
-if(cmd==='edit'){editing=Number(arg);render();return}if(cmd==='cancel'){editing=null;render();return}if(cmd==='claim'){if(val('person')==='')throw Error('Выбери себя');ok=await call('claim',{index:Number(val('person')),name:val('name')});if(ok)tab='home'}if(cmd==='saveGift'){const preview=app.querySelector('#photo-preview');const name=val('giftname').trim();const url=new URL(val('url')).href;if(!name||preview.dataset.url!==url||!preview.hasAttribute('src'))return;ok=await call(editing===null?'add':'edit',{index:editing,gift:{name,url,note:val('note'),photo:preview.src}});if(ok)editing=null}if(cmd==='delete'&&confirm('Удалить подарок?'))ok=await call('delete',{index:Number(arg)});if(cmd==='settings')ok=await call('settings',{date:val('date')+'+05:00',budget:val('budget')});if(cmd==='restoreDraw'&&confirm('Восстановить первое распределение без изменения получателей?'))ok=await call('restoreDraw');if(cmd==='resetProfile'&&confirm('Сбросить профиль? Его желания будут удалены, а доступ к прежнему назначению закрыт.'))ok=await call('resetProfile',{index:Number(arg)});if(ok)render()}catch(e){err.textContent=e.message}finally{if(showPending){trigger.classList.remove('button-pending');trigger.removeAttribute('aria-busy');}}});if(tg?.initData){if(await call()){if(!state.me&&state.admin)tab='admin';render()}}else app.innerHTML='<section><h2>Открой в Telegram</h2><p>Приложение работает через кнопку в боте.</p></section>';setInterval(timer,1000);setInterval(async()=>{if(state&&['home','target'].includes(tab)&&state.date&&Date.parse(state.date)<=Date.now()&&!state.drawn){if(await call())render()}},15000);
+if(cmd==='edit'){editing=Number(arg);render();return}if(cmd==='cancel'){editing=null;render();return}if(cmd==='claim'){if(val('person')==='')throw Error('Выбери себя');ok=await call('claim',{index:Number(val('person')),name:val('name')});if(ok)tab='home'}if(cmd==='saveGift'){const preview=app.querySelector('#photo-preview');const name=val('giftname').trim();const url=new URL(val('url')).href;if(!name||!preview.hasAttribute('src'))return;ok=await call(editing===null?'add':'edit',{index:editing,gift:{name,url,note:val('note'),photo:preview.src}});if(ok)editing=null}if(cmd==='delete'&&confirm('Удалить подарок?'))ok=await call('delete',{index:Number(arg)});if(cmd==='settings')ok=await call('settings',{date:val('date')+'+05:00',budget:val('budget')});if(cmd==='restoreDraw'&&confirm('Восстановить первое распределение без изменения получателей?'))ok=await call('restoreDraw');if(cmd==='resetProfile'&&confirm('Сбросить профиль? Его желания будут удалены, а доступ к прежнему назначению закрыт.'))ok=await call('resetProfile',{index:Number(arg)});if(ok)render()}catch(e){err.textContent=e.message}finally{if(showPending){trigger.classList.remove('button-pending');trigger.removeAttribute('aria-busy');}}});if(tg?.initData){if(await call()){if(!state.me&&state.admin)tab='admin';render()}}else app.innerHTML='<section><h2>Открой в Telegram</h2><p>Приложение работает через кнопку в боте.</p></section>';setInterval(timer,1000);setInterval(async()=>{if(state&&['home','target'].includes(tab)&&state.date&&Date.parse(state.date)<=Date.now()&&!state.drawn){if(await call())render()}},15000);
 </script></body></html>
