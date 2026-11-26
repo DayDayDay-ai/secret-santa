@@ -1,1 +1,1 @@
-{"functions":{"api/index.mjs":{"maxDuration":40}},"outputDirectory":"public","rewrites":[{"source":"/api/bot","destination":"/api/index?action=webhook"},{"source":"/api/tick","destination":"/api/index?action=tick"}]}
+{"functions":{"api/index.mjs":{"maxDuration":40,"includeFiles":"node_modules/@sparticuz/chromium/bin/**"}},"outputDirectory":"public","rewrites":[{"source":"/api/bot","destination":"/api/index?action=webhook"},{"source":"/api/tick","destination":"/api/index?action=tick"}]}
