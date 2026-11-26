@@ -17,3 +17,24 @@ test('a rebound profile cannot see the archived recipient', () => {
   assert.equal(view(state, '1', false).me, null);
   assert.equal(view(state, '2', false).target.name, participants[distribution[1]].name);
 });
+import {schedule,defaultDate} from './lib/schedule.mjs';
+import {advance,nextBatch} from './lib/notifications.mjs';
+test('early and late registrations use one deadline for gifts, draw and notification',()=>{
+  const s={people:structuredClone(people),date:defaultDate,notified:[]};
+  const start=Date.parse(defaultDate);
+  assert.equal(nextBatch(s,start-1).ids.length,6);
+  assert.equal(due(s,start-1),false);
+  assert.equal(due(s,start),true);
+  delete s.people[5].uid;
+  assert.equal(due(s,start+86400000),false);
+  assert.equal(nextBatch(s),null);
+  const last=start+7200000;
+  Object.assign(s.people[5],{uid:'6',joinedAt:new Date(last).toISOString()});
+  assert.equal(Date.parse(schedule(s).reveal),last+86400000);
+  advance(s,last+86400000-1);
+  assert.ok(!s.draw);
+  advance(s,last+86400000);
+  assert.equal(nextBatch(s).key,'reveal');
+  s.notified=s.people.map(p=>p.uid);
+  assert.equal(nextBatch(s),null);
+});
