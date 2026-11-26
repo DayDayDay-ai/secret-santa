@@ -91,7 +91,7 @@ function setupGiftForm() {
     validate();
     if (validLink()) debounce = setTimeout(() => prepare(async url => {
       const image = await findProductPhoto(url);
-      return image ? photo(await (await fetch(image)).blob()) : null;
+      return image;
     }, 'Ищем фото товара…', 'Фото не найдено. Выберите его из галереи.'), 450);
   });
   name.addEventListener('input', validate);
