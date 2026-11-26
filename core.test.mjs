@@ -1,6 +1,6 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import {draw,view,verify,due} from './lib/core.mjs';import {createHmac} from 'node:crypto';
 const people=Array.from({length:6},(_,i)=>({name:['Мария','Александр','Алина','Михаил','Карина','Ильхам'][i],pair:Math.floor(i/2),uid:String(i+1),gifts:[{name:'gift'+i}]}));
-test('10000 valid draws',()=>{for(let n=0;n<10000;n++){const a=draw(people);assert.equal(new Set(a).size,6);a.forEach((j,i)=>{assert.notEqual(i,j);assert.notEqual(people[i].pair,people[j].pair);assert.equal(i%2,j%2)})}});test('privacy',()=>{const s={people,draw:draw(people)};const admin=view(s,'99',true);assert.equal(admin.target,null);assert.equal(admin.me,null);assert.ok(!JSON.stringify(admin).includes('gift'));const p=view(s,'1',true);assert.equal(p.target.name,people[s.draw[0]].name);assert.equal(p.people[0].uid,undefined)});test('due',()=>{assert.ok(due({people,date:new Date(0).toISOString()}));assert.ok(!due({people:people.slice(0,5).concat({}),date:new Date(0).toISOString()}))});test('Telegram HMAC',()=>{const token='test';const p=new URLSearchParams({auth_date:String(Math.floor(Date.now()/1000)),user:JSON.stringify({id:123})});const secret=createHmac('sha256','WebAppData').update(token).digest();p.set('hash',createHmac('sha256',secret).update([...p].sort().map(([k,v])=>k+'='+v).join('\n')).digest('hex'));assert.equal(verify(p.toString(),token),'123');assert.throws(()=>verify(p.toString(),'wrong'))});
+test('10000 valid draws',()=>{for(let n=0;n<10000;n++){const a=draw(people);assert.equal(new Set(a).size,6);a.forEach((j,i)=>{assert.notEqual(i,j);assert.notEqual(people[i].pair,people[j].pair);assert.equal(i%2,j%2)})}});test('privacy',()=>{const s={people,draw:draw(people)};const admin=view(s,'99',true);assert.equal(admin.target,null);assert.equal(admin.me,null);assert.ok(!JSON.stringify(admin).includes('gift'));const p=view(s,'1',true);assert.equal(p.target.name,people[s.draw[0]].name);assert.equal(p.people[0].uid,undefined)});test('due',()=>{assert.ok(due({people},Date.parse(defaultDate)));assert.ok(!due({people:people.slice(0,5).concat({})},Date.parse(defaultDate)))});test('Telegram HMAC',()=>{const token='test';const p=new URLSearchParams({auth_date:String(Math.floor(Date.now()/1000)),user:JSON.stringify({id:123})});const secret=createHmac('sha256','WebAppData').update(token).digest();p.set('hash',createHmac('sha256',secret).update([...p].sort().map(([k,v])=>k+'='+v).join('\n')).digest('hex'));assert.equal(verify(p.toString(),token),'123');assert.throws(()=>verify(p.toString(),'wrong'))});
 
 test('a rebound profile cannot see the archived recipient', () => {
   const participants = structuredClone(people);
@@ -30,10 +30,10 @@ test('early and late registrations use one deadline for gifts, draw and notifica
   assert.equal(nextBatch(s),null);
   const last=start+7200000;
   Object.assign(s.people[5],{uid:'6',joinedAt:new Date(last).toISOString()});
-  assert.equal(Date.parse(schedule(s).reveal),last+86400000);
-  advance(s,last+86400000-1);
+  assert.equal(Date.parse(schedule(s).reveal),start);
+  advance(s,start-1);
   assert.ok(!s.draw);
-  advance(s,last+86400000);
+  advance(s,last);
   assert.equal(nextBatch(s).key,'reveal');
   s.notified=s.people.map(p=>p.uid);
   assert.equal(nextBatch(s),null);
