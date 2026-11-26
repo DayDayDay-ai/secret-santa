@@ -74,7 +74,34 @@ function setupGiftForm() {
 const viewer=document.querySelector('#photo-viewer');
 const fullPhoto=viewer.querySelector('img');
 const backButton=tg?.BackButton;
-let edgeTouch;
+let edgeTouch, gesture;
+let zoom=1, offsetX=0, offsetY=0;
+function paintPhoto(){
+  fullPhoto.style.transform='translate('+offsetX+'px,'+offsetY+'px) scale('+zoom+')';
+}
+function startPhotoGesture(event){
+  const [a,b]=event.touches;
+  gesture=b?{distance:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),zoom}:a?{x:a.clientX-offsetX,y:a.clientY-offsetY}:null;
+}
+viewer.addEventListener('touchstart',startPhotoGesture,{passive:true});
+viewer.addEventListener('touchmove',event=>{
+  const [a,b]=event.touches;
+  if(!gesture||!a)return;
+  if(b&&gesture.distance){
+    zoom=Math.max(1,Math.min(5,gesture.zoom*Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)/gesture.distance));
+  }else if(!b&&zoom>1&&gesture.x!==undefined){
+    offsetX=a.clientX-gesture.x;
+    offsetY=a.clientY-gesture.y;
+  }else return;
+  event.preventDefault();
+  const maxX=fullPhoto.offsetWidth*(zoom-1)/2;
+  const maxY=fullPhoto.offsetHeight*(zoom-1)/2;
+  offsetX=Math.max(-maxX,Math.min(maxX,offsetX));
+  offsetY=Math.max(-maxY,Math.min(maxY,offsetY));
+  paintPhoto();
+},{passive:false});
+viewer.addEventListener('touchend',startPhotoGesture,{passive:true});
+viewer.addEventListener('touchcancel',()=>{gesture=null;edgeTouch=null},{passive:true});
 function closePhoto(){
   if(viewer.open && history.state?.giftPhoto) history.back();
 }
@@ -90,6 +117,7 @@ app.addEventListener('click',event=>{
 window.addEventListener('popstate',()=>{
   if(!viewer.open)return;
   viewer.close();
+  zoom=1;offsetX=offsetY=0;gesture=edgeTouch=null;paintPhoto();
   fullPhoto.removeAttribute('src');
   backButton?.offClick(closePhoto);
   backButton?.hide();
@@ -98,7 +126,7 @@ viewer.querySelector('button').addEventListener('click',closePhoto);
 viewer.addEventListener('cancel',event=>{event.preventDefault();closePhoto()});
 viewer.addEventListener('touchstart',event=>{
   const touch=event.changedTouches[0];
-  edgeTouch=touch.clientX<32||touch.clientX>innerWidth-32?[touch.clientX,touch.clientY]:null;
+  edgeTouch=event.touches.length===1&&zoom===1&&(touch.clientX<32||touch.clientX>innerWidth-32)?[touch.clientX,touch.clientY]:null;
 },{passive:true});
 viewer.addEventListener('touchend',event=>{
   if(!edgeTouch)return;

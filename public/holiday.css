@@ -121,3 +121,4 @@ button:not(:disabled):active{transform:scale(.97)}
   color: white;
   background: #343438;
 }
+#photo-viewer { touch-action: none; }
